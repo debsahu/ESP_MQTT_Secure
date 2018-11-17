@@ -48,7 +48,7 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 #endif
 
 #ifdef CHECK_PUB_KEY
-// Extracted by: openssl x509 -pubkey -noout -in servercert.pem
+// Extracted by: openssl x509 -pubkey -noout -in ca.crt
 static const char pubkey[] PROGMEM = R"KEY(
 -----BEGIN PUBLIC KEY-----
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -65,5 +65,6 @@ xxxxxxxx
 #endif
 
 #ifdef CHECK_FINGERPRINT
+// Extracted by: openssl x509 -fingerprint -in ca.crt
 static const char fp[] PROGMEM = "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD";
 #endif
