@@ -52,4 +52,8 @@ keyfile /etc/mosquitto/certs/raspberrypi.key
 require_certificate false
 
 ```
+After updating mosquitto.conf, start the mosquitto server
+```
+$ sudo systemctl start mosquitto.service 
+```
 Remember to forward ports 8883 and 9883 to the internet!
