@@ -4,7 +4,7 @@
 
 Demonstration on ESP8266 & ESP32 using SSL/TLSv1.2 two-way handshake with secured mosquitto broker.
 
-[![ESP_MQTT_Secure](https://img.youtube.com/vi/xxxxxxxxxx/0.jpg)](https://www.youtube.com/watch?v=xxxxxxxxxxxx)
+[![ESP_MQTT_Secure](https://img.youtube.com/vi/ytQUbyab4es/0.jpg)](https://www.youtube.com/watch?v=ytQUbyab4es)
 
 ## Dependencies
 
