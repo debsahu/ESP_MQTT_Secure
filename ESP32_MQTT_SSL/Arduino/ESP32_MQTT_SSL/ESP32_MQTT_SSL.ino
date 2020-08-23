@@ -115,7 +115,7 @@ void setup()
   Serial.print("Current time: ");
   Serial.print(ctime(&now));
 
-  net.setCACert(local_root_ca);
+  //net.setCACert(local_root_ca);
   client.begin(MQTT_HOST, MQTT_PORT, net);
   client.onMessage(messageReceived);
   mqtt_connect();
