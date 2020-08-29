@@ -3,7 +3,12 @@
 #include "src/dependencies/WiFiClientSecure/WiFiClientSecure.h" //using older WiFiClientSecure
 #include <time.h>
 #include <MQTT.h>
-//#include "secrets.h"
+#include "secrets_local.h"
+
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_Sensor.h>
+#include "Adafruit_BME680.h"
 
 #ifndef SECRET
   const char ssid[] = "WiFiSSID";
@@ -56,13 +61,57 @@
 #endif
 
 const char MQTT_SUB_TOPIC[] = "home/" HOSTNAME "/in";
-const char MQTT_PUB_TOPIC[] = "home/" HOSTNAME "/out";
+const char MQTT_PUB_TOPIC_TEMP[] = "home/" HOSTNAME "/out/temperature";
+const char MQTT_PUB_TOPIC_HUM[] = "home/" HOSTNAME "/out/humidity";
+const char MQTT_PUB_TOPIC_PRES[] = "home/" HOSTNAME "/out/pressure";
+const char MQTT_PUB_TOPIC_RES[] = "home/" HOSTNAME "/out/gasResistance";
 
 WiFiClientSecure net;
 MQTTClient client;
 
+Adafruit_BME680 bme; // I2C
+
+float temperature;
+float humidity;
+float pressure;
+float gasResistance;
+
 time_t now;
 unsigned long lastMillis = 0;
+
+void getBME680Readings(){
+  // Tell BME680 to begin measurement.
+  unsigned long endTime = bme.beginReading();
+  if (endTime == 0) {
+    Serial.println(F("Failed to begin reading :("));
+    return;
+  }
+  if (!bme.endReading()) {
+    Serial.println(F("Failed to complete reading :("));
+    return;
+  }
+  temperature = bme.temperature;
+  pressure = bme.pressure / 100.0;
+  humidity = bme.humidity;
+  gasResistance = bme.gas_resistance / 1000.0;
+}
+
+String processor(const String& var){
+  getBME680Readings();
+  //Serial.println(var);
+  if(var == "TEMPERATURE"){
+    return String(temperature);
+  }
+  else if(var == "HUMIDITY"){
+    return String(humidity);
+  }
+  else if(var == "PRESSURE"){
+    return String(pressure);
+  }
+ else if(var == "GAS"){
+    return String(gasResistance);
+  }
+}
 
 void mqtt_connect()
 {
@@ -119,6 +168,18 @@ void setup()
   client.begin(MQTT_HOST, MQTT_PORT, net);
   client.onMessage(messageReceived);
   mqtt_connect();
+
+  // Init BME680 sensor
+  if (!bme.begin()) {
+    Serial.println(F("Could not find a valid BME680 sensor, check wiring!"));
+    while (1);
+  }
+  // Set up oversampling and filter initialization
+  bme.setTemperatureOversampling(BME680_OS_8X);
+  bme.setHumidityOversampling(BME680_OS_2X);
+  bme.setPressureOversampling(BME680_OS_4X);
+  bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
+  bme.setGasHeater(320, 150); // 320*C for 150 ms
 }
 
 void loop()
@@ -147,8 +208,19 @@ void loop()
     }
   }
 
-  if (millis() - lastMillis > 5000) {
+  if (millis() - lastMillis > 60000) {
     lastMillis = millis();
-    client.publish(MQTT_PUB_TOPIC, ctime(&now), false, 0);
+
+    getBME680Readings();
+    Serial.printf("Temperature = %.2f ºC \n", temperature);
+    Serial.printf("Humidity = %.2f % \n", humidity);
+    Serial.printf("Pressure = %.2f hPa \n", pressure);
+    Serial.printf("Gas Resistance = %.2f KOhm \n", gasResistance);
+    Serial.println();
+
+    client.publish(MQTT_PUB_TOPIC_TEMP, String(temperature).c_str(), false, 0);
+    client.publish(MQTT_PUB_TOPIC_HUM, String(humidity).c_str(), false, 0);
+    client.publish(MQTT_PUB_TOPIC_PRES, String(pressure).c_str(), false, 0);
+    client.publish(MQTT_PUB_TOPIC_RES, String(gasResistance).c_str(), false, 0);
   }
 }

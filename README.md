@@ -57,3 +57,19 @@ After updating mosquitto.conf, start the mosquitto server
 $ sudo systemctl start mosquitto.service 
 ```
 Remember to forward ports 8883 and 9883 to the internet!
+
+## Sidenotes
+
+# Rebase from fork
+git remote add upstream https://github.com/debsahu/ESP_MQTT_Secure.git
+git fetch upstream
+git checkout master
+git rebase upstream/master
+
+# Modification needed
+Create secrets_local.h, compile and run it.
+This modified project uses the forked iostack https://github.com/menghin/IOTstack 
+
+# Links
+https://maker.pro/arduino/tutorial/how-to-use-platformio-in-visual-studio-code-to-program-arduino
+https://www.youtube.com/watch?v=ytQUbyab4es
