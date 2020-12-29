@@ -14,7 +14,8 @@
   const char ssid[] = "WiFiSSID";
   const char pass[] = "WiFiPassword";
 
-  #define HOSTNAME "mqtt_test"
+  #define LOCATION "home"
+  #define HOSTNAME LOCATION "_0"
 
   const char *MQTT_HOST = "xxx.yyy.zzz";
   const int MQTT_PORT = 8883;
@@ -60,11 +61,11 @@
 
 #endif
 
-const char MQTT_SUB_TOPIC[] = "home/" HOSTNAME "/in";
-const char MQTT_PUB_TOPIC_TEMP[] = "home/" HOSTNAME "/out/temperature";
-const char MQTT_PUB_TOPIC_HUM[] = "home/" HOSTNAME "/out/humidity";
-const char MQTT_PUB_TOPIC_PRES[] = "home/" HOSTNAME "/out/pressure";
-const char MQTT_PUB_TOPIC_RES[] = "home/" HOSTNAME "/out/gasResistance";
+const char MQTT_SUB_TOPIC[] = LOCATION "/" HOSTNAME "/in";
+const char MQTT_PUB_TOPIC_TEMP[] = LOCATION "/" HOSTNAME "/out/temperature";
+const char MQTT_PUB_TOPIC_HUM[] = LOCATION "/" HOSTNAME "/out/humidity";
+const char MQTT_PUB_TOPIC_PRES[] = LOCATION "/" HOSTNAME "/out/pressure";
+const char MQTT_PUB_TOPIC_RES[] = LOCATION "/" HOSTNAME "/out/gasResistance";
 
 WiFiClientSecure net;
 MQTTClient client;
@@ -108,9 +109,15 @@ String processor(const String& var){
   else if(var == "PRESSURE"){
     return String(pressure);
   }
- else if(var == "GAS"){
+  else if(var == "GAS"){
     return String(gasResistance);
   }
+  else{
+    Serial.println(F("Sensor id unknown!"));
+    while (1);
+  }
+
+
 }
 
 void mqtt_connect()
@@ -213,7 +220,7 @@ void loop()
 
     getBME680Readings();
     Serial.printf("Temperature = %.2f ºC \n", temperature);
-    Serial.printf("Humidity = %.2f % \n", humidity);
+    Serial.printf("Humidity = %.2f Percent \n", humidity);
     Serial.printf("Pressure = %.2f hPa \n", pressure);
     Serial.printf("Gas Resistance = %.2f KOhm \n", gasResistance);
     Serial.println();

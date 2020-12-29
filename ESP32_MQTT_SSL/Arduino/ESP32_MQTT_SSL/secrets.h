@@ -3,7 +3,8 @@
 const char ssid[] = "WiFiSSID";
 const char pass[] = "WiFiPassword";
 
-#define HOSTNAME "mqtt_test"
+#define LOCATION "home"
+#define HOSTNAME LOCATION "_0"
 
 const char *MQTT_HOST = "xxx.yyy.zzz";
 const int MQTT_PORT = 8883;
